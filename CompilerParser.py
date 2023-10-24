@@ -161,7 +161,7 @@ class CompilerParser:
         @return a ParseTree that represents a var declaration
         """
         # Generate parse tree
-        var_tree = ParseTree("classVarDec", " ")
+        var_tree = ParseTree("varDec", " ")
         # static|field #
         var_tree.addChild(self.mustBe("keyword", "var"))
         # type: int, boolean, char, void, class_name #
