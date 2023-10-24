@@ -29,29 +29,29 @@ class CompilerParser:
         ## Generate a parse tree
         class_tree = ParseTree("class", " ")
         class_tree.addChild(self.mustBe("keyword", " class"))
-        # className #
+        global class_name
         class_name = self.current().getValue()
         class_tree.addChild(self.mustBe("identifier", class_name))
         # { #
         class_tree.addChild(self.mustBe("symbol", "{"))
         try:
-          VarDec = self.compileClassVarDec(class_name)
+          VarDec = self.compileClassVarDec()
           while VarDec is not None:
             class_tree.addChild(VarDec)
-            VarDec = self.compileClassVarDec(class_name)
+            VarDec = self.compileClassVarDec()
         except ParseException:
             pass
         try:
-            Subroutine = self.compileSubroutine(class_name)
+            Subroutine = self.compileSubroutine()
             while Subroutine is not None:
                 class_tree.addChild(Subroutine)
-                Subroutine = self.compileSubroutine(class_name)
+                Subroutine = self.compileSubroutine()
         except ParseException:
             pass   
         class_tree.addChild(self.mustBe("symbol", "}"))
         return class_tree
 
-    def compileClassVarDec(self, class_name):
+    def compileClassVarDec(self):
         """
         Generates a parse tree for a static variable declaration or field declaration
         @return a ParseTree that represents a static variable declaration or field declaration
@@ -79,7 +79,7 @@ class CompilerParser:
 
         return var_tree
 
-    def compileSubroutine(self, class_name):
+    def compileSubroutine(self):
         """
         Generates a parse tree for a method, function, or constructor
         @return a ParseTree that represents the method, function, or constructor
@@ -99,24 +99,24 @@ class CompilerParser:
         # ( #
         sub_tree.addChild(self.mustBe("symbol", "("))
         try:
-             Params = self.compileParameterList(class_name)
+             Params = self.compileParameterList()
              while Params is not None:
                  sub_tree.addChild(Params)
-                 Params = self.compileParameterList(class_name)
+                 Params = self.compileParameterList()
         except ParseException as e:
             print(f"ParseException in compileSubroutine (Params): {e}")
         sub_tree.addChild(self.mustBe("symbol", ")"))
         try:
-             SubroutineBody = self.compileSubroutineBody(class_name)
+             SubroutineBody = self.compileSubroutineBody()
              while SubroutineBody is not None:
                  sub_tree.addChild(SubroutineBody)
-                 SubroutineBody = self.compileSubroutineBody(class_name)
+                 SubroutineBody = self.compileSubroutineBody()
         except ParseException as e:
             print(f"ParseException in compileSubroutine (Body): {e}")
             
         return sub_tree
 
-    def compileParameterList(self, class_name):
+    def compileParameterList(self):
         """
         Generates a parse tree for a subroutine's parameters
         @return a ParseTree that represents a subroutine's parameters
@@ -136,7 +136,7 @@ class CompilerParser:
         print(param_tree)
         return param_tree
 
-    def compileSubroutineBody(self, class_name):
+    def compileSubroutineBody(self):
         """
         Generates a parse tree for a subroutine's body
         @return a ParseTree that represents a subroutine's body
@@ -145,17 +145,17 @@ class CompilerParser:
         subbody_tree = ParseTree("subroutineBody", " ")
         subbody_tree.addChild(self.mustBe("symbol", "{"))
         try:
-          VarDec = self.compileVarDec(class_name)
+          VarDec = self.compileVarDec()
           while VarDec is not None:
             subbody_tree.addChild(VarDec)
-            VarDec = self.compileVarDec(class_name)
+            VarDec = self.compileVarDec()
         except ParseException as e:
          print(f"ParseException in compileSubroutineBody: {e}")
         subbody_tree.addChild(self.mustBe("symbol", "}"))
 
         return subbody_tree
 
-    def compileVarDec(self, class_name):
+    def compileVarDec(self):
         """
         Generates a parse tree for a variable declaration
         @return a ParseTree that represents a var declaration
