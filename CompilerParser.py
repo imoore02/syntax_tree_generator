@@ -108,7 +108,7 @@ class CompilerParser:
         sub_tree.addChild(self.mustBe("symbol", ")"))
         try:
              SubroutineBody = self.compileSubroutineBody(class_name)
-             while Params is not None:
+             while SubroutineBody is not None:
                  sub_tree.addChild(SubroutineBody)
                  SubroutineBody = self.compileSubroutineBody(class_name)
         except ParseException as e:
