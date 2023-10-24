@@ -26,9 +26,6 @@ class CompilerParser:
         Generates a parse tree for a single class
         @return a ParseTree that represents a class
         """
-        if not self.have("keyword", "class"):
-            raise ParseException("The program does not begin with a class")
-        
         ## Generate a parse tree
         class_tree = ParseTree("class", " ")
         class_tree.addChild(self.mustBe("keyword", " class"))
@@ -37,14 +34,20 @@ class CompilerParser:
         class_tree.addChild(self.mustBe("identifier", class_name))
         # { #
         class_tree.addChild(self.mustBe("symbol", "{"))
-        print(class_tree)
         try:
           VarDec = self.compileClassVarDec(class_name)
           while VarDec is not None:
             class_tree.addChild(VarDec)
             VarDec = self.compileClassVarDec(class_name)
-        except ParseException as e:
-         print(f"ParseException: {e}")
+        except ParseException:
+            pass
+        try:
+            Subroutine = self.compileSubroutine(class_name)
+            while Subroutine is not None:
+                class_tree.addChild(Subroutine)
+                Suboutine = self.compileSubroutine(class_name)
+        except ParseException:
+            pass   
         class_tree.addChild(self.mustBe("symbol", "}"))
         return class_tree
 
@@ -54,50 +57,130 @@ class CompilerParser:
         @return a ParseTree that represents a static variable declaration or field declaration
         """
         expected_values = ["static", "field"]
-        if not self.have("keyword", expected_values):
-            raise ParseException("A non class variable declaration was detected")
         # Generate parse tree
         var_tree = ParseTree("classVarDec", " ")
         # static|field #
         var_tree.addChild(self.mustBe("keyword", expected_values))
-        # type: int, bool etc #
+        # type: int, boolean, char, void, class_name #
         type_values = ["int", "char", "boolean", class_name]
         var_tree.addChild(self.mustBe("keyword", type_values))
         # varName #
         var_name = self.current().getValue()
         var_tree.addChild(self.mustBe("identifier", var_name))
+        try:
+            while self.have("symbol", ","):
+                var_tree.addChild(self.mustBe("symbol", ","))
+                var_name = self.current().getValue()
+                var_tree.addChild(self.mustBe("identifier", var_name))
+        except ParseException:
+            pass 
         # ; #
         var_tree.addChild(self.mustBe("symbol", ";"))
 
         return var_tree
 
-    def compileSubroutine(self):
+    def compileSubroutine(self, class_name):
         """
         Generates a parse tree for a method, function, or constructor
         @return a ParseTree that represents the method, function, or constructor
         """
-        return None
+        # Check that a subroutine is present
+        subroutine_values = ["method", "function", "constructor"]
+        # Generate a parse tree for the subroutine
+        sub_tree = ParseTree("subroutine", " ")
+         # constructor|function|method #
+        sub_tree.addChild(self.mustBe("keyword", subroutine_values))
+		# type: int, boolean, char, void, class_name #
+        type_values = ["int", "char", "boolean", class_name, "void"]
+        sub_tree.addChild(self.mustBe("keyword", type_values))
+        # className #
+        subroutine_name = self.current().getValue()
+        sub_tree.addChild(self.mustBe("identifier", subroutine_name))
+        # ( #
+        sub_tree.addChild(self.mustBe("symbol", "("))
+        try:
+             Params = self.compileParameterList(class_name)
+             while Params is not None:
+                 sub_tree.addChild(Params)
+                 Params = self.compileParameterList(class_name)
+        except ParseException as e:
+            print(f"ParseException in compileSubroutine (Params): {e}")
+        sub_tree.addChild(self.mustBe("symbol", ")"))
+        try:
+             SubroutineBody = self.compileSubroutineBody(class_name)
+             while Params is not None:
+                 sub_tree.addChild(SubroutineBody)
+                 SubroutineBody = self.compileSubroutineBody(class_name)
+        except ParseException as e:
+            print(f"ParseException in compileSubroutine (Body): {e}")
+            
+        return sub_tree
 
-    def compileParameterList(self):
+    def compileParameterList(self, class_name):
         """
         Generates a parse tree for a subroutine's parameters
         @return a ParseTree that represents a subroutine's parameters
         """
-        return None
+        param_tree = ParseTree("parameterList", " ")
+        type_values = ["int", "char", "boolean", class_name, "void"]
+        param_tree.addChild(self.mustBe('keyword', type_values))
+        param_name = self.current().getValue()
+        param_tree.addChild(self.mustBe("identifier", param_name))
+        try:
+            while self.have("symbol", ",") is True:
+                param_tree.addChild(self.mustBe("symbol", ","))
+                param_name = self.current().getValue()
+                param_tree.addChild(self.mustBe("identifier", param_name))
+        except ParseException:
+            pass
+        print(param_tree)
+        return param_tree
 
-    def compileSubroutineBody(self):
+    def compileSubroutineBody(self, class_name):
         """
         Generates a parse tree for a subroutine's body
         @return a ParseTree that represents a subroutine's body
         """
-        return None
+        
+        subbody_tree = ParseTree("subroutineBody", " ")
+        subbody_tree.addChild(self.mustBe("symbol", "{"))
+        try:
+          VarDec = self.compileVarDec(class_name)
+          while VarDec is not None:
+            subbody_tree.addChild(VarDec)
+            VarDec = self.compileVarDec(class_name)
+        except ParseException as e:
+         print(f"ParseException in compileSubroutineBody: {e}")
+        subbody_tree.addChild(self.mustBe("symbol", "}"))
 
-    def compileVarDec(self):
+        return subbody_tree
+
+    def compileVarDec(self, class_name):
         """
         Generates a parse tree for a variable declaration
         @return a ParseTree that represents a var declaration
         """
-        return None
+        # Generate parse tree
+        var_tree = ParseTree("classVarDec", " ")
+        # static|field #
+        var_tree.addChild(self.mustBe("keyword", "var"))
+        # type: int, boolean, char, void, class_name #
+        type_values = ["int", "char", "boolean", class_name]
+        var_tree.addChild(self.mustBe("keyword", type_values))
+        # varName #
+        var_name = self.current().getValue()
+        var_tree.addChild(self.mustBe("identifier", var_name))
+        try:
+            while self.have("symbol", ",") is True:
+                var_tree.addChild(self.mustBe("symbol", ","))
+                var_name = self.current().getValue()
+                var_tree.addChild(self.mustBe("identifier", var_name))
+        except ParseException:
+            pass
+        # ; #
+        var_tree.addChild(self.mustBe("symbol", ";"))
+
+        return var_tree
 
     def compileStatements(self):
         """
@@ -195,7 +278,9 @@ class CompilerParser:
             and current_token.getValue() in expectedValue
         ):
             return True
-        raise ParseException("Current token does not match type or value")
+        raise ParseException(
+                f"Expected type: {expectedType} and expected value: {expectedValue}. Detected type: {self.current().getType()} and detected value: {self.current().getValue()}"
+            )
         return False
 
     def mustBe(self, expectedType, expectedValue):
@@ -229,11 +314,22 @@ if __name__ == "__main__":
     tokens.append(Token("keyword", "static"))
     tokens.append(Token("keyword", "int"))
     tokens.append(Token("identifier", "a"))
-    tokens.append(Token("symbol", ";"))
-    tokens.append(Token("keyword", "field"))
-    tokens.append(Token("keyword", "boolean"))
+    tokens.append(Token("symbol", ","))
     tokens.append(Token("identifier", "myName"))
     tokens.append(Token("symbol", ";"))
+    tokens.append(Token("keyword", "function"))
+    tokens.append(Token("keyword", "void"))
+    tokens.append(Token("identifier", "myName"))
+    tokens.append(Token("symbol", "("))
+    tokens.append(Token("keyword", "int"))
+    tokens.append(Token("identifier", "a"))
+    tokens.append(Token("symbol", ")"))
+    tokens.append(Token("symbol", "{"))
+    tokens.append(Token("keyword", "var"))
+    tokens.append(Token("keyword", "int"))
+    tokens.append(Token("identifier", "a"))
+    tokens.append(Token("symbol", ";"))
+    tokens.append(Token("symbol", "}"))
     tokens.append(Token("symbol", "}"))
     parser = CompilerParser(tokens)
     try:
