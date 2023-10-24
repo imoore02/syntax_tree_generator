@@ -104,7 +104,7 @@ class CompilerParser:
                  sub_tree.addChild(Params)
                  Params = self.compileParameterList()
         except ParseException as e:
-            print(f"ParseException in compileSubroutine (Params): {e}")
+            pass
         sub_tree.addChild(self.mustBe("symbol", ")"))
         try:
              SubroutineBody = self.compileSubroutineBody()
@@ -112,7 +112,7 @@ class CompilerParser:
                  sub_tree.addChild(SubroutineBody)
                  SubroutineBody = self.compileSubroutineBody()
         except ParseException as e:
-            print(f"ParseException in compileSubroutine (Body): {e}")
+            pass
             
         return sub_tree
 
@@ -149,8 +149,8 @@ class CompilerParser:
           while VarDec is not None:
             subbody_tree.addChild(VarDec)
             VarDec = self.compileVarDec()
-        except ParseException as e:
-         print(f"ParseException in compileSubroutineBody: {e}")
+        except ParseException:
+            pass
         subbody_tree.addChild(self.mustBe("symbol", "}"))
 
         return subbody_tree
@@ -309,7 +309,7 @@ if __name__ == "__main__":
     """
     tokens = []
     tokens.append(Token("keyword", "class"))
-    tokens.append(Token("identifier", "MyClass"))
+    tokens.append(Token("identifier", "Test"))
     tokens.append(Token("symbol", "{"))
     tokens.append(Token("keyword", "static"))
     tokens.append(Token("keyword", "int"))
@@ -317,25 +317,12 @@ if __name__ == "__main__":
     tokens.append(Token("symbol", ","))
     tokens.append(Token("identifier", "myName"))
     tokens.append(Token("symbol", ";"))
-    tokens.append(Token("keyword", "function"))
-    tokens.append(Token("keyword", "void"))
-    tokens.append(Token("identifier", "test3"))
+    tokens.append(Token("keyword", "constructor"))
+    tokens.append(Token("keyword", "Test"))
+    tokens.append(Token("identifier", "new"))
     tokens.append(Token("symbol", "("))
     tokens.append(Token("symbol", ")"))
     tokens.append(Token("symbol", "{"))
-    tokens.append(Token("symbol", "}"))
-    tokens.append(Token("keyword", "function"))
-    tokens.append(Token("keyword", "void"))
-    tokens.append(Token("identifier", "test4"))
-    tokens.append(Token("symbol", "("))
-    tokens.append(Token("symbol", ")"))
-    tokens.append(Token("symbol", "{"))
-    tokens.append(Token("keyword", "var"))
-    tokens.append(Token("keyword", "int"))
-    tokens.append(Token("identifier", "a"))
-    tokens.append(Token("symbol", ","))
-    tokens.append(Token("identifier", "myName"))
-    tokens.append(Token("symbol", ";"))
     tokens.append(Token("symbol", "}"))
     tokens.append(Token("symbol", "}"))
     parser = CompilerParser(tokens)
