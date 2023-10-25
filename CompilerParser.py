@@ -19,6 +19,13 @@ class CompilerParser:
         if not self.tokens:
             raise ParseException("No tokens to parse")
         program_tree = self.compileClass()
+        subroutine_values = ["constructor", "function", "method"]
+        try:
+            while self.tokens:
+                if self.have("keyword", subroutine_values):
+                    program_tree = self.compileSubroutine()
+        except ParseException:
+            pass
         return program_tree
 
     def compileClass(self):
@@ -133,7 +140,6 @@ class CompilerParser:
                 param_tree.addChild(self.mustBe("identifier", param_name))
         except ParseException:
             pass
-        print(param_tree)
         return param_tree
 
     def compileSubroutineBody(self):
@@ -311,19 +317,13 @@ if __name__ == "__main__":
     tokens.append(Token("keyword", "class"))
     tokens.append(Token("identifier", "Test"))
     tokens.append(Token("symbol", "{"))
-    tokens.append(Token("keyword", "static"))
-    tokens.append(Token("keyword", "int"))
-    tokens.append(Token("identifier", "a"))
-    tokens.append(Token("symbol", ","))
-    tokens.append(Token("identifier", "myName"))
-    tokens.append(Token("symbol", ";"))
+    tokens.append(Token("symbol", "}"))
     tokens.append(Token("keyword", "constructor"))
     tokens.append(Token("keyword", "Test"))
     tokens.append(Token("identifier", "new"))
     tokens.append(Token("symbol", "("))
     tokens.append(Token("symbol", ")"))
     tokens.append(Token("symbol", "{"))
-    tokens.append(Token("symbol", "}"))
     tokens.append(Token("symbol", "}"))
     parser = CompilerParser(tokens)
     try:
