@@ -23,7 +23,7 @@ class CompilerParser:
         try:
             while self.tokens:
                 if self.have("keyword", subroutine_values):
-                    program_tree = self.compileSubroutine()
+                    program_tree.addChild(self.compileSubroutine())
         except ParseException:
             pass
         return program_tree
