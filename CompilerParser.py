@@ -125,22 +125,17 @@ class CompilerParser:
         @return a ParseTree that represents a subroutine's parameters
         """
         param_tree = ParseTree("parameterList", " ")
+        type_values = ["int", "char", "boolean", class_name, "void"]
+        param_tree.addChild(self.mustBe('keyword', type_values))
+        param_name = self.current().getValue()
+        param_tree.addChild(self.mustBe("identifier", param_name))
         try:
-            while self.have('symbol', ')') is False:
-                 param_name = self.current().getValue()
-                 param_tree.addChild(self.mustBe('keyword', param_name))
-                 param_name = self.current().getValue()
-                 param_tree.addChild(self.mustBe("identifier", param_name))
-                 try:
-                      while self.have("symbol", ",") is True:
-                              param_tree.addChild(self.mustBe("symbol", ","))
-                              param_name = self.current().getValue()
-                              param_tree.addChild(self.mustBe("identifier", param_name))
-                 except ParseException:
-                     pass
+            while self.have("symbol", ",") is True:
+                param_tree.addChild(self.mustBe("symbol", ","))
+                param_name = self.current().getValue()
+                param_tree.addChild(self.mustBe("identifier", param_name))
         except ParseException:
             pass
-                
         return param_tree
 
     def compileSubroutineBody(self):
@@ -316,6 +311,7 @@ if __name__ == "__main__":
     tokens.append(Token("keyword", "class"))
     tokens.append(Token("identifier", "Test"))
     tokens.append(Token("symbol", "{"))
+    tokens.append(Token("symbol", "}"))
     tokens.append(Token("keyword", "constructor"))
     tokens.append(Token("keyword", "Test"))
     tokens.append(Token("identifier", "new"))
@@ -326,7 +322,7 @@ if __name__ == "__main__":
     tokens.append(Token("symbol", "}"))
     parser = CompilerParser(tokens)
     try:
-        result = parser.compileProgram()
+        result = parser.compileSubroutine()
         print(result)
     except ParseException:
         print("Error Parsing!")
