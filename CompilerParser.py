@@ -108,8 +108,7 @@ class CompilerParser:
                  sub_tree.addChild(SubroutineBody)
                  SubroutineBody = self.compileSubroutineBody()
         except ParseException as e:
-            print(f"ParseException in compileSubroutine (Body): {e}")
-            
+            pass
         return sub_tree
 
     def compileParameterList(self):
@@ -150,7 +149,7 @@ class CompilerParser:
             subbody_tree.addChild(VarDec)
             VarDec = self.compileVarDec()
         except ParseException as e:
-         print(f"ParseException in compileSubroutineBody: {e}")
+            pass
         subbody_tree.addChild(self.mustBe("symbol", "}"))
 
         return subbody_tree
