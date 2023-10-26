@@ -19,13 +19,6 @@ class CompilerParser:
         if not self.tokens:
             raise ParseException("No tokens to parse")
         program_tree = self.compileClass()
-        subroutine_values = ["constructor", "function", "method"]
-        try:
-            while self.tokens:
-                if self.have("keyword", subroutine_values):
-                    program_tree.addChild(self.compileSubroutine())
-        except ParseException:
-            pass
         return program_tree
 
     def compileClass(self):
@@ -95,9 +88,10 @@ class CompilerParser:
         subroutine_values = ["method", "function", "constructor"]
         # Generate a parse tree for the subroutine
         sub_tree = ParseTree("subroutine", " ")
-        # constructor|function|method #
+         # constructor|function|method #
         sub_tree.addChild(self.mustBe("keyword", subroutine_values))
-        type_values = ["int", "char", "boolean", "void", class_name]
+		# type: int, boolean, char, void, class_name #
+        type_values = ["int", "char", "boolean", class_name, "void"]
         lst = ["keyword", "identifier"]
         sub_tree.addChild(self.mustBe(lst, type_values))
         # className #
@@ -114,7 +108,7 @@ class CompilerParser:
                  sub_tree.addChild(SubroutineBody)
                  SubroutineBody = self.compileSubroutineBody()
         except ParseException as e:
-            print(f"ParseException in subrlutine(body): {e}")
+            print(f"ParseException in compileSubroutine (Body): {e}")
             
         return sub_tree
 
@@ -126,20 +120,20 @@ class CompilerParser:
         param_tree = ParseTree("parameterList", " ")
         try:
             while self.have('symbol', ')') is False:
-                 param_name = self.current().getValue()
-                 param_tree.addChild(self.mustBe('keyword', param_name))
-                 param_name = self.current().getValue()
-                 param_tree.addChild(self.mustBe("identifier", param_name))
-                 try:
-                      while self.have("symbol", ",") is True:
-                              param_tree.addChild(self.mustBe("symbol", ","))
-                              param_name = self.current().getValue()
-                              param_tree.addChild(self.mustBe("identifier", param_name))
-                 except ParseException:
-                     pass
+                type_values = ["int", "char", "boolean", class_name, "void"]
+                lst = ['keyword', 'identifier']
+                param_tree.addChild(self.mustBe(lst, type_values))
+                param_name = self.current().getValue()
+                param_tree.addChild(self.mustBe("identifier", param_name))
+                try:
+                    while self.have("symbol", ",") is True:
+                        param_tree.addChild(self.mustBe("symbol", ","))
+                        param_name = self.current().getValue()
+                        param_tree.addChild(self.mustBe("identifier", param_name))
+                except ParseException:
+                    pass
         except ParseException:
             pass
-                
         return param_tree
 
     def compileSubroutineBody(self):
@@ -155,8 +149,8 @@ class CompilerParser:
           while VarDec is not None:
             subbody_tree.addChild(VarDec)
             VarDec = self.compileVarDec()
-        except ParseException:
-            pass
+        except ParseException as e:
+         print(f"ParseException in compileSubroutineBody: {e}")
         subbody_tree.addChild(self.mustBe("symbol", "}"))
 
         return subbody_tree
@@ -287,6 +281,7 @@ class CompilerParser:
         raise ParseException(
                 f"Expected type: {expectedType} and expected value: {expectedValue}. Detected type: {self.current().getType()} and detected value: {self.current().getValue()}"
             )
+        return False
 
     def mustBe(self, expectedType, expectedValue):
         """
@@ -302,6 +297,7 @@ class CompilerParser:
             raise ParseException(
                 f"Expected type: {expectedType} and expected value: {expectedValue}. Detected type: {self.current().getType()} and detected value: {self.current().getValue()}"
             )
+        return None
 
 
 if __name__ == "__main__":
@@ -313,11 +309,11 @@ if __name__ == "__main__":
     """
     tokens = []
     tokens.append(Token("keyword", "class"))
-    tokens.append(Token("identifier", "Test"))
+    tokens.append(Token("identifier", "MyClass"))
     tokens.append(Token("symbol", "{"))
-    tokens.append(Token("keyword", "constructor"))
-    tokens.append(Token("keyword", "Test"))
-    tokens.append(Token("identifier", "new"))
+    tokens.append(Token("keyword", "function"))
+    tokens.append(Token("identifier", "MyClass"))
+    tokens.append(Token("identifier", "test3"))
     tokens.append(Token("symbol", "("))
     tokens.append(Token("symbol", ")"))
     tokens.append(Token("symbol", "{"))
