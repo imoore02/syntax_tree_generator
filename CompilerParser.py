@@ -119,8 +119,7 @@ class CompilerParser:
         param_tree = ParseTree("parameterList", " ")
         while self.have("symbol", ")") is False:
             type_values = ["int", "char", "boolean", class_name, "void"]
-            lst = ['keyword', 'identifier']
-            param_tree.addChild(self.mustBe(lst, type_values))
+            param_tree.addChild(self.mustBe('keyword', type_values))
             param_name = self.current().getValue()
             param_tree.addChild(self.mustBe("identifier", param_name))
             try:
