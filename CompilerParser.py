@@ -29,7 +29,6 @@ class CompilerParser:
         ## Generate a parse tree
         class_tree = ParseTree("class", " ")
         class_tree.addChild(self.mustBe("keyword", " class"))
-        global class_name
         class_name = self.current().getValue()
         class_tree.addChild(self.mustBe("identifier", class_name))
         # { #
@@ -61,9 +60,12 @@ class CompilerParser:
         var_tree = ParseTree("classVarDec", " ")
         # static|field #
         var_tree.addChild(self.mustBe("keyword", expected_values))
-        # type: int, boolean, char, void, class_name #
-        type_values = ["int", "char", "boolean", class_name]
-        var_tree.addChild(self.mustBe("keyword", type_values))
+        type_values = ["int", "char", "boolean"]
+        if self.have('keyword', type_values) is True:
+            var_tree.addChild(self.mustBe("keyword", type_values))
+        else:
+            class_name = self.current().getValue()
+            var_tree.addChild(self.mustBe("identifier", class_name))
         # varName #
         var_name = self.current().getValue()
         var_tree.addChild(self.mustBe("identifier", var_name))
@@ -91,9 +93,12 @@ class CompilerParser:
          # constructor|function|method #
         sub_tree.addChild(self.mustBe("keyword", subroutine_values))
 		# type: int, boolean, char, void, class_name #
-        type_values = ["int", "char", "boolean", class_name, "void"]
-        lst = ["keyword", "identifier"]
-        sub_tree.addChild(self.mustBe(lst, type_values))
+        type_values = ["int", "char", "boolean", "void"]
+        if self.have('keyword', type_values) is True:
+            sub_tree.addChild(self.mustBe("keyword", type_values))
+        else:
+            class_name = self.current().getValue()
+            sub_tree.addChild(self.mustBe("identifier", class_name))
         # className #
         subroutine_name = self.current().getValue()
         sub_tree.addChild(self.mustBe("identifier", subroutine_name))
@@ -118,9 +123,12 @@ class CompilerParser:
         """
         param_tree = ParseTree("parameterList", " ")
         while self.have("symbol", ")") is False:
-            type_values = ["int", "char", "boolean", class_name, "void"]
-            lst = ['keyword', 'identifier']
-            param_tree.addChild(self.mustBe(lst, type_values))
+            type_values = ["int", "char", "boolean", "void"]
+            if self.have('keyword', type_values) is True:
+                param_tree.addChild(self.mustBe("keyword", type_values))
+            else:
+                class_name = self.current().getValue()
+                param_tree.addChild(self.mustBe("identifier", class_name))
             param_name = self.current().getValue()
             param_tree.addChild(self.mustBe("identifier", param_name))
             try:
@@ -161,8 +169,12 @@ class CompilerParser:
         # static|field #
         var_tree.addChild(self.mustBe("keyword", "var"))
         # type: int, boolean, char, void, class_name #
-        type_values = ["int", "char", "boolean", class_name]
-        var_tree.addChild(self.mustBe("keyword", type_values))
+        type_values = ["int", "char", "boolean"]
+        if self.have('keyword', type_values) is True:
+            var_tree.addChild(self.mustBe("keyword", type_values))
+        else:
+            class_name = self.current().getValue()
+            var_tree.addChild(self.mustBe("identifier", class_name))
         # varName #
         var_name = self.current().getValue()
         var_tree.addChild(self.mustBe("identifier", var_name))
@@ -305,7 +317,7 @@ if __name__ == "__main__":
     tokens.append(Token("identifier", "MyClass"))
     tokens.append(Token("symbol", "{"))
     tokens.append(Token("keyword", "function"))
-    tokens.append(Token("identifier", "MyClass"))
+    tokens.append(Token("keyword", "int"))
     tokens.append(Token("identifier", "test3"))
     tokens.append(Token("symbol", "("))
     tokens.append(Token("keyword", "int"))
