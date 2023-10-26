@@ -131,11 +131,10 @@ class CompilerParser:
                 param_tree.addChild(self.mustBe("identifier", class_name))
             param_name = self.current().getValue()
             param_tree.addChild(self.mustBe("identifier", param_name))
+            print(param_tree)
             try:
                 while self.have("symbol", ",") is True:
                         param_tree.addChild(self.mustBe("symbol", ","))
-                        param_name = self.current().getValue()
-                        param_tree.addChild(self.mustBe("identifier", param_name))
             except ParseException:
                 pass
             try:
@@ -320,6 +319,16 @@ if __name__ == "__main__":
     tokens = []
     tokens.append(Token("keyword", "int"))
     tokens.append(Token("identifier", "a"))
+    tokens.append(Token("symbol", ","))
+    tokens.append(Token("keyword", "char"))
+    tokens.append(Token("identifier", "b"))
+    tokens.append(Token("symbol", ","))
+    tokens.append(Token("keyword", "boolean"))
+    tokens.append(Token("identifier", "c"))
+    tokens.append(Token("symbol", ","))
+    tokens.append(Token("identifier", "Test"))
+    tokens.append(Token("identifier", "d"))
+    
     parser = CompilerParser(tokens)
     try:
         result = parser.compileParameterList()
