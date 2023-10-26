@@ -97,9 +97,16 @@ class CompilerParser:
         sub_tree = ParseTree("subroutine", " ")
          # constructor|function|method #
         sub_tree.addChild(self.mustBe("keyword", subroutine_values))
-		# type: int, boolean, char, void, class_name #
-        type_values = ["int", "char", "boolean", class_name, "void"]
-        sub_tree.addChild(self.mustBe("keyword", type_values))
+        print(sub_tree)
+        try:
+            type_values = ["int", "char", "boolean", "void"]
+            if self.have("keyword", type_values) is not None:
+                sub_tree.addChild(self.mustBe("keyword", type_values))
+            else:
+                type_name = self.current().getValue()
+                sub_tree.addChild(self.mustBe("identifier", type_name))
+        except ParseException as e:
+            print(f"ParseException in subroutine(iden/type): {e}")
         # className #
         subroutine_name = self.current().getValue()
         sub_tree.addChild(self.mustBe("identifier", subroutine_name))
@@ -111,7 +118,7 @@ class CompilerParser:
                  sub_tree.addChild(Params)
                  Params = self.compileParameterList()
         except ParseException as e:
-            pass
+            print(f"ParseException in subroutineParams: {e}")
         sub_tree.addChild(self.mustBe("symbol", ")"))
         try:
              SubroutineBody = self.compileSubroutineBody()
@@ -119,7 +126,7 @@ class CompilerParser:
                  sub_tree.addChild(SubroutineBody)
                  SubroutineBody = self.compileSubroutineBody()
         except ParseException as e:
-            pass
+            print(f"ParseException in subrlutine(body): {e}")
             
         return sub_tree
 
@@ -129,8 +136,8 @@ class CompilerParser:
         @return a ParseTree that represents a subroutine's parameters
         """
         param_tree = ParseTree("parameterList", " ")
-        type_values = ["int", "char", "boolean", class_name, "void"]
-        param_tree.addChild(self.mustBe('keyword', type_values))
+        param_name = self.current().getValue()
+        param_tree.addChild(self.mustBe('keyword', param_name))
         param_name = self.current().getValue()
         param_tree.addChild(self.mustBe("identifier", param_name))
         try:
@@ -287,7 +294,6 @@ class CompilerParser:
         raise ParseException(
                 f"Expected type: {expectedType} and expected value: {expectedValue}. Detected type: {self.current().getType()} and detected value: {self.current().getValue()}"
             )
-        return False
 
     def mustBe(self, expectedType, expectedValue):
         """
@@ -303,7 +309,6 @@ class CompilerParser:
             raise ParseException(
                 f"Expected type: {expectedType} and expected value: {expectedValue}. Detected type: {self.current().getType()} and detected value: {self.current().getValue()}"
             )
-        return None
 
 
 if __name__ == "__main__":
@@ -317,13 +322,13 @@ if __name__ == "__main__":
     tokens.append(Token("keyword", "class"))
     tokens.append(Token("identifier", "Test"))
     tokens.append(Token("symbol", "{"))
-    tokens.append(Token("symbol", "}"))
     tokens.append(Token("keyword", "constructor"))
     tokens.append(Token("keyword", "Test"))
     tokens.append(Token("identifier", "new"))
     tokens.append(Token("symbol", "("))
     tokens.append(Token("symbol", ")"))
     tokens.append(Token("symbol", "{"))
+    tokens.append(Token("symbol", "}"))
     tokens.append(Token("symbol", "}"))
     parser = CompilerParser(tokens)
     try:
