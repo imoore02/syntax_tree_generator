@@ -117,7 +117,7 @@ class CompilerParser:
         @return a ParseTree that represents a subroutine's parameters
         """
         param_tree = ParseTree("parameterList", " ")
-        while self.current().getType() is not 'symbol' and self.current().getValue() is not ')':
+        while self.have("symbol", ")") is False:
             type_values = ["int", "char", "boolean", class_name, "void"]
             lst = ['keyword', 'identifier']
             param_tree.addChild(self.mustBe(lst, type_values))
@@ -274,9 +274,6 @@ class CompilerParser:
             and current_token.getValue() in expectedValue
         ):
             return True
-        raise ParseException(
-                f"Expected type: {expectedType} and expected value: {expectedValue}. Detected type: {self.current().getType()} and detected value: {self.current().getValue()}"
-            )
         return False
 
     def mustBe(self, expectedType, expectedValue):
@@ -304,24 +301,14 @@ if __name__ == "__main__":
         }
     """
     tokens = []
-    tokens.append(Token("keyword", "class"))
-    tokens.append(Token("identifier", "MyClass"))
-    tokens.append(Token("symbol", "{"))
-    tokens.append(Token("keyword", "function"))
-    tokens.append(Token("identifier", "MyClass"))
-    tokens.append(Token("identifier", "test3"))
-    tokens.append(Token("symbol", "("))
     tokens.append(Token("keyword", "int"))
     tokens.append(Token("identifier", "varName"))
     tokens.append(Token("symbol", ","))
-    tokens.append(Token("identifier", "varName2"))
+    tokens.append(Token("identifier", "varName"))
     tokens.append(Token("symbol", ")"))
-    tokens.append(Token("symbol", "{"))
-    tokens.append(Token("symbol", "}"))
-    tokens.append(Token("symbol", "}"))
     parser = CompilerParser(tokens)
     try:
-        result = parser.compileProgram()
+        result = parser.compileParameterList()
         print(result)
     except ParseException:
         print("Error Parsing!")
