@@ -95,30 +95,19 @@ class CompilerParser:
         subroutine_values = ["method", "function", "constructor"]
         # Generate a parse tree for the subroutine
         sub_tree = ParseTree("subroutine", " ")
-         # constructor|function|method #
+        # constructor|function|method #
         sub_tree.addChild(self.mustBe("keyword", subroutine_values))
         print(sub_tree)
-        try:
-            type_values = ["int", "char", "boolean", "void"]
-            if self.have("keyword", type_values) is not None:
-                sub_tree.addChild(self.mustBe("keyword", type_values))
-            else:
-                type_name = self.current().getValue()
-                sub_tree.addChild(self.mustBe("identifier", type_name))
-        except ParseException as e:
-            print(f"ParseException in subroutine(iden/type): {e}")
+        type_values = ["int", "char", "boolean", "void", class_name]
+        lst = ["keyword", "identifier"]
+        sub_tree.addChild(self.mustBe(lst, type_values))
         # className #
         subroutine_name = self.current().getValue()
         sub_tree.addChild(self.mustBe("identifier", subroutine_name))
         # ( #
         sub_tree.addChild(self.mustBe("symbol", "("))
-        try:
-             Params = self.compileParameterList()
-             while Params is not None:
-                 sub_tree.addChild(Params)
-                 Params = self.compileParameterList()
-        except ParseException as e:
-            print(f"ParseException in subroutineParams: {e}")
+        Params = self.compileParameterList()
+        sub_tree.addChild(Params)
         sub_tree.addChild(self.mustBe("symbol", ")"))
         try:
              SubroutineBody = self.compileSubroutineBody()
@@ -136,17 +125,22 @@ class CompilerParser:
         @return a ParseTree that represents a subroutine's parameters
         """
         param_tree = ParseTree("parameterList", " ")
-        param_name = self.current().getValue()
-        param_tree.addChild(self.mustBe('keyword', param_name))
-        param_name = self.current().getValue()
-        param_tree.addChild(self.mustBe("identifier", param_name))
         try:
-            while self.have("symbol", ",") is True:
-                param_tree.addChild(self.mustBe("symbol", ","))
-                param_name = self.current().getValue()
-                param_tree.addChild(self.mustBe("identifier", param_name))
+            while self.have('symbol', ')') is False:
+                 param_name = self.current().getValue()
+                 param_tree.addChild(self.mustBe('keyword', param_name))
+                 param_name = self.current().getValue()
+                 param_tree.addChild(self.mustBe("identifier", param_name))
+                 try:
+                      while self.have("symbol", ",") is True:
+                              param_tree.addChild(self.mustBe("symbol", ","))
+                              param_name = self.current().getValue()
+                              param_tree.addChild(self.mustBe("identifier", param_name))
+                 except ParseException:
+                     pass
         except ParseException:
             pass
+                
         return param_tree
 
     def compileSubroutineBody(self):
