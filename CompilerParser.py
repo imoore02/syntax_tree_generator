@@ -117,19 +117,20 @@ class CompilerParser:
         @return a ParseTree that represents a subroutine's parameters
         """
         param_tree = ParseTree("parameterList", " ")
-        while self.have("symbol", ")") is False:
-            type_values = ["int", "char", "boolean", class_name, "void"]
-            param_tree.addChild(self.mustBe('keyword', type_values))
-            param_name = self.current().getValue()
-            param_tree.addChild(self.mustBe("identifier", param_name))
-            try:
-                while self.have("symbol", ",") is True:
-                        param_tree.addChild(self.mustBe("symbol", ","))
-                        param_name = self.current().getValue()
-                        param_tree.addChild(self.mustBe("identifier", param_name))
-            except ParseException:
-                pass
+        type_values = ["int", "char", "boolean", class_name, "void"]
+        param_tree.addChild(self.mustBe('keyword', type_values))
+        param_name = self.current().getValue()
+        param_tree.addChild(self.mustBe("identifier", param_name))
+        try:
+            while self.have("symbol", ",") is True:
+                param_tree.addChild(self.mustBe("symbol", ","))
+                param_name = self.current().getValue()
+                param_tree.addChild(self.mustBe("identifier", param_name))
+        except ParseException:
+            pass
+        print(param_tree)
         return param_tree
+
 
     def compileSubroutineBody(self):
         """
@@ -300,14 +301,24 @@ if __name__ == "__main__":
         }
     """
     tokens = []
+    tokens.append(Token("keyword", "class"))
+    tokens.append(Token("identifier", "MyClass"))
+    tokens.append(Token("symbol", "{"))
+    tokens.append(Token("keyword", "function"))
+    tokens.append(Token("identifier", "MyClass"))
+    tokens.append(Token("identifier", "test3"))
+    tokens.append(Token("symbol", "("))
     tokens.append(Token("keyword", "int"))
     tokens.append(Token("identifier", "varName"))
     tokens.append(Token("symbol", ","))
     tokens.append(Token("identifier", "varName"))
     tokens.append(Token("symbol", ")"))
+    tokens.append(Token("symbol", "{"))
+    tokens.append(Token("symbol", "}"))
+    tokens.append(Token("symbol", "}"))
     parser = CompilerParser(tokens)
     try:
-        result = parser.compileParameterList()
+        result = parser.compileProgram()
         print(result)
     except ParseException:
         print("Error Parsing!")
