@@ -138,6 +138,10 @@ class CompilerParser:
                         param_tree.addChild(self.mustBe("identifier", param_name))
             except ParseException:
                 pass
+            try:
+                self.current()
+            except ParseException as e:
+                break
         return param_tree
 
     def compileSubroutineBody(self):
@@ -269,6 +273,7 @@ class CompilerParser:
             return self.tokens[self.current_token_index]
         else:
             raise ParseException("No more tokens available")
+        return None
 
     def have(self, expectedType, expectedValue):
         """
@@ -313,24 +318,11 @@ if __name__ == "__main__":
         }
     """
     tokens = []
-    tokens.append(Token("keyword", "class"))
-    tokens.append(Token("identifier", "MyClass"))
-    tokens.append(Token("symbol", "{"))
-    tokens.append(Token("keyword", "function"))
     tokens.append(Token("keyword", "int"))
-    tokens.append(Token("identifier", "test3"))
-    tokens.append(Token("symbol", "("))
-    tokens.append(Token("keyword", "int"))
-    tokens.append(Token("identifier", "varName"))
-    tokens.append(Token("symbol", ","))
-    tokens.append(Token("identifier", "varName"))
-    tokens.append(Token("symbol", ")"))
-    tokens.append(Token("symbol", "{"))
-    tokens.append(Token("symbol", "}"))
-    tokens.append(Token("symbol", "}"))
+    tokens.append(Token("identifier", "a"))
     parser = CompilerParser(tokens)
     try:
-        result = parser.compileProgram()
+        result = parser.compileParameterList()
         print(result)
     except ParseException:
         print("Error Parsing!")
