@@ -117,22 +117,19 @@ class CompilerParser:
         @return a ParseTree that represents a subroutine's parameters
         """
         param_tree = ParseTree("parameterList", " ")
-        try:
-            while self.have('symbol', ')') is False:
-                type_values = ["int", "char", "boolean", class_name, "void"]
-                lst = ['keyword', 'identifier']
-                param_tree.addChild(self.mustBe(lst, type_values))
-                param_name = self.current().getValue()
-                param_tree.addChild(self.mustBe("identifier", param_name))
-                try:
-                    while self.have("symbol", ",") is True:
+        while self.current().getType() is not 'symbol' and self.current().getValue() is not ')':
+            type_values = ["int", "char", "boolean", class_name, "void"]
+            lst = ['keyword', 'identifier']
+            param_tree.addChild(self.mustBe(lst, type_values))
+            param_name = self.current().getValue()
+            param_tree.addChild(self.mustBe("identifier", param_name))
+            try:
+                while self.have("symbol", ",") is True:
                         param_tree.addChild(self.mustBe("symbol", ","))
                         param_name = self.current().getValue()
                         param_tree.addChild(self.mustBe("identifier", param_name))
-                except ParseException:
-                    pass
-        except ParseException:
-            pass
+            except ParseException:
+                pass
         return param_tree
 
     def compileSubroutineBody(self):
@@ -314,6 +311,10 @@ if __name__ == "__main__":
     tokens.append(Token("identifier", "MyClass"))
     tokens.append(Token("identifier", "test3"))
     tokens.append(Token("symbol", "("))
+    tokens.append(Token("keyword", "int"))
+    tokens.append(Token("identifier", "varName"))
+    tokens.append(Token("symbol", ","))
+    tokens.append(Token("identifier", "varName2"))
     tokens.append(Token("symbol", ")"))
     tokens.append(Token("symbol", "{"))
     tokens.append(Token("symbol", "}"))
