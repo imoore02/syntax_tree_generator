@@ -218,7 +218,10 @@ class CompilerParser:
         var_name = self.current().getValue()
         let_tree.addChild(self.mustBe("identifier", var_name))
         let_tree.addChild(self.mustBe("symbol", "="))
-        let_tree.addChild(self.compileExpression())
+        try:
+            let_tree.addChild(self.compileExpression())
+        except ParseException as e:
+            print(f"{e}")
         let_tree.addChild(self.mustBe("symbol", ";"))
         return let_tree
 
