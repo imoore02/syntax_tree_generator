@@ -200,7 +200,7 @@ class CompilerParser:
         @return a ParseTree that represents the series of statements
         """
         statement_tree = ParseTree("statements", " ")
-        while self.have("symbol", "}") is not True:
+        while self.have("symbol", "}") is False:
             if self.have("keyword", "let"):
                 try:
                     statement_tree.addChild(self.compileLet())
