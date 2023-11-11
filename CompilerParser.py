@@ -219,8 +219,18 @@ class CompilerParser:
         let_tree.addChild(self.mustBe("keyword","let"))
         var_name = self.current().getValue()
         let_tree.addChild(self.mustBe("identifier", var_name))
+        if self.have ("symbol", "=") is False:
+            let_tree.addChild(self.mustBe("symbol", "["))
+            try:
+                let_tree.addChild(self.compileExpression())
+            except ParseException as e:
+                print(f'Prase exception compileLet: {e}')
+            let_tree.addChild(self.mustBe("symbol", "]"))   
         let_tree.addChild(self.mustBe("symbol", "="))
-        let_tree.addChild(self.compileExpression())
+        try:
+            let_tree.addChild(self.compileExpression())
+        except ParseException as e:
+            print(f'Prase exception compileLet: {e}')
         let_tree.addChild(self.mustBe("symbol", ";"))
         return let_tree
 
@@ -291,7 +301,7 @@ class CompilerParser:
         elif current_token.getType() == "stringConstant":
             term_tree.addChild(self.mustBe("stringConstant", current_token.getValue()))
         else:
-            print("other")
+            return None
         return term_tree
 
     def compileExpressionList(self):
