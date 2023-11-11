@@ -312,6 +312,14 @@ class CompilerParser:
         expression_tree = ParseTree("expression", " ")
         if self.have("keyword", "skip"):
             expression_tree.addChild(self.mustBe("keyword","skip"))
+        else:
+            expression_tree.addChild(self.compileTerm())
+            op_symbols = ["+", "-", "*", "/", "&", "|", "<", ">", "="]
+            try:
+                while self.have("symbol", op_symbols) is True:
+                     expression_tree.addChild(self.compileTerm())
+            except ParseException as e:
+                    print(f'Prase exception compileExpression: {e}')
         return expression_tree
 
     def compileTerm(self):
@@ -319,7 +327,8 @@ class CompilerParser:
         Generates a parse tree for an expression term
         @return a ParseTree that represents the expression term
         """
-        return None
+        term_tree = ParseTree("term", " ")
+        return term_tree
 
     def compileExpressionList(self):
         """
@@ -378,7 +387,6 @@ class CompilerParser:
             raise ParseException(
                 f"Expected type: {expectedType} and expected value: {expectedValue}. Detected type: {self.current().getType()} and detected value: {self.current().getValue()}"
             )
-        return None
 
 
 if __name__ == "__main__":
@@ -458,9 +466,7 @@ if __name__ == "__main__":
     tokens.append(Token("keyword", "return"))
     tokens.append(Token("keyword", "skip"))
     tokens.append(Token("symbol", ";"))
-        
-    """
-    tokens = []
+    
     tokens.append(Token("keyword", "let"))
     tokens.append(Token("identifier", "a"))
     tokens.append(Token("symbol", "="))
@@ -469,10 +475,20 @@ if __name__ == "__main__":
     tokens.append(Token("keyword", "do"))
     tokens.append(Token("keyword", "skip"))
     tokens.append(Token("symbol", ";"))
+        
+    """
+    tokens = []
+    tokens.append(Token("integerConstant", "1"))
+    tokens.append(Token("symbol", "+"))
+    tokens.append(Token("symbol", "("))
+    tokens.append(Token("identifier", "a"))
+    tokens.append(Token("symbol", "-"))
+    tokens.append(Token("identifier", "b"))
+    tokens.append(Token("symbol", ")"))
     
     parser = CompilerParser(tokens)
     try:
-        result = parser.compileStatements()
+        result = parser.compileExpression()
         print(result)
     except ParseException:
         print("Error Parsing!")
