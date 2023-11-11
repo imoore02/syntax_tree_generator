@@ -202,17 +202,19 @@ class CompilerParser:
         
         """
         statement_tree = ParseTree("statements", " ")
+        statement_values = ["let", "if", "while", "do", "return"]
         try:
-            if self.have("keyword", "let") is True:
-                statement_tree.addChild(self.compileLet())
-            elif self.have("keyword", "if") is True:
-                    statement_tree.addChild(self.compileIf())
-            elif self.have("keyword", "while") is True:
-                    statement_tree.addChild(self.compileWhile())
-            elif self.have("keyword", "do") is True:
-                    statement_tree.addChild(self.compileDo())
-            elif self.have("keyword", "return") is True:
-                    statement_tree.addChild(self.compileReturn())
+            while self.have("keyword", statement_values) is True:
+                if self.have("keyword", "let") is True:
+                       statement_tree.addChild(self.compileLet())
+                elif self.have("keyword", "if") is True:
+                      statement_tree.addChild(self.compileIf())
+                elif self.have("keyword", "while") is True:
+                     statement_tree.addChild(self.compileWhile())
+                elif self.have("keyword", "do") is True:
+                     statement_tree.addChild(self.compileDo())
+                elif self.have("keyword", "return") is True:
+                     statement_tree.addChild(self.compileReturn())
         except ParseException as e:
                     print(f'Prase exception compileStatements: {e}')
         return statement_tree
@@ -452,16 +454,25 @@ if __name__ == "__main__":
     tokens.append(Token("symbol", "{"))
     tokens.append(Token("symbol", "}"))
     tokens.append(Token("symbol", "}"))
+    
+    tokens.append(Token("keyword", "return"))
+    tokens.append(Token("keyword", "skip"))
+    tokens.append(Token("symbol", ";"))
         
     """
     tokens = []
-    tokens.append(Token("keyword", "return"))
+    tokens.append(Token("keyword", "let"))
+    tokens.append(Token("identifier", "a"))
+    tokens.append(Token("symbol", "="))
+    tokens.append(Token("keyword", "skip"))
+    tokens.append(Token("symbol", ";"))
+    tokens.append(Token("keyword", "do"))
     tokens.append(Token("keyword", "skip"))
     tokens.append(Token("symbol", ";"))
     
     parser = CompilerParser(tokens)
     try:
-        result = parser.compileReturn()
+        result = parser.compileStatements()
         print(result)
     except ParseException:
         print("Error Parsing!")
