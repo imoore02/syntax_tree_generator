@@ -358,7 +358,14 @@ class CompilerParser:
         Generates a parse tree for an expression list
         @return a ParseTree that represents the expression list
         """
-        return None
+        expressionList_Tree = ParseTree("expressionList", " ")
+        Expression = self.compileExpression
+        if Expression is not None:
+            expressionList_Tree.addChild(self.compileExpression())
+            while self.have("symbol", ","):
+                 expressionList_Tree.addChild(self.mustBe("symbol", ","))
+                 expressionList_Tree.addChild(self.compileExpression())
+        return expressionList_Tree
 
     def next(self):
         """
