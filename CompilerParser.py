@@ -233,7 +233,6 @@ class CompilerParser:
                   let_tree.addChild(self.mustBe("symbol", "]"))
         except ParseException as e:
                 print(f'Prase exception compileLet: {e}')
-        print(let_tree) 
         let_tree.addChild(self.mustBe("symbol", "="))
         let_tree.addChild(self.compileExpression())
         let_tree.addChild(self.mustBe("symbol", ";"))
@@ -245,6 +244,21 @@ class CompilerParser:
         @return a ParseTree that represents the statement
         """
         if_tree = ParseTree("ifStatement", " ")
+        if_tree.addChild(self.mustBe("keyword","if"))
+        if_tree.addChild(self.mustBe("symbol","("))
+        if_tree.addChild(self.compileExpression())
+        if_tree.addChild(self.mustBe("symbol",")"))
+        if_tree.addChild(self.mustBe("symbol","{"))
+        if_tree.addChild(self.compileStatements())
+        if_tree.addChild(self.mustBe("symbol","}"))
+        try:
+            if self.have("keyword", "else") is True:
+                if_tree.addChild(self.mustBe("keyword","else"))
+                if_tree.addChild(self.mustBe("symbol","{"))
+                if_tree.addChild(self.compileStatements())
+                if_tree.addChild(self.mustBe("symbol","}"))
+        except ParseException as e:
+                print(f'Prase exception compileIf: {e}')      
         return if_tree
 
     def compileWhile(self):
@@ -401,15 +415,27 @@ if __name__ == "__main__":
     tokens.append(Token("symbol", ","))
     tokens.append(Token("identifier", "Test"))
     tokens.append(Token("identifier", "d"))
-        
-    """
-    tokens = []
+    
     tokens.append(Token("symbol", "{"))
     tokens.append(Token("keyword", "let"))
     tokens.append(Token("identifier", "a"))
     tokens.append(Token("symbol", "="))
     tokens.append(Token("keyword", "skip"))
     tokens.append(Token("symbol", ";"))
+    tokens.append(Token("symbol", "}"))
+        
+    """
+    tokens = []
+    tokens.append(Token("symbol", "{"))
+    tokens.append(Token("keyword", "if"))
+    tokens.append(Token("symbol", "("))
+    tokens.append(Token("keyword", "skip"))
+    tokens.append(Token("symbol", ")"))
+    tokens.append(Token("symbol", "{"))
+    tokens.append(Token("symbol", "}"))
+    tokens.append(Token("keyword", "else"))
+    tokens.append(Token("symbol", "{"))
+    tokens.append(Token("symbol", "}"))
     tokens.append(Token("symbol", "}"))
     
     parser = CompilerParser(tokens)
