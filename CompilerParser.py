@@ -199,7 +199,38 @@ class CompilerParser:
         Generates a parse tree for a series of statements
         @return a ParseTree that represents the series of statements
         """
-        return None
+        statement_tree = ParseTree("statements", " ")
+        while self.have("symbol", "}") is not True:
+            if self.have("keyword", "let"):
+                try:
+                    statement_tree.addChild(self.compileLet())
+                except ParseException as e:
+                    print(f'Prase exception compileStatements: {e}')
+            elif self.have("keyword", "if"):
+                try:
+                    statement_tree.addChild(self.compileIf())
+                except ParseException as e:
+                    print(f'Prase exception compileStatements: {e}')
+            elif self.have("keyword", "while"):
+                try:
+                    statement_tree.addChild(self.compileWhile())
+                except ParseException as e:
+                    print(f'Prase exception compileStatements: {e}')
+            elif self.have("keyword", "do"):
+                try:
+                    statement_tree.addChild(self.compileDo())
+                except ParseException as e:
+                    print(f'Prase exception compileStatements: {e}')
+            elif self.have("keyword", "return"):
+                try:
+                    statement_tree.addChild(self.compileReturn())
+                except ParseException as e:
+                    print(f'Prase exception compileStatements: {e}')
+            try:
+                self.current()
+            except ParseException as e:
+                break
+        return statement_tree
 
     def compileLet(self):
         """
