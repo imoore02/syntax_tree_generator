@@ -512,7 +512,7 @@ if __name__ == "__main__":
     
     parser = CompilerParser(tokens)
     try:
-        result = parser.compileTerm()
+        result = parser.compileExpression()
         print(result)
     except ParseException:
         print("Error Parsing!")
