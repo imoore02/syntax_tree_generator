@@ -204,6 +204,26 @@ class CompilerParser:
                     statement_tree.addChild(self.compileLet())
                 except ParseException as e:
                     print(f'Prase exception compileStatements: {e}')
+            elif self.have("keyword", "if"):
+                try:
+                    statement_tree.addChild(self.compileIf())
+                except ParseException as e:
+                    print(f'Prase exception compileStatements: {e}')
+            elif self.have("keyword", "while"):
+                try:
+                    statement_tree.addChild(self.compileWhile())
+                except ParseException as e:
+                    print(f'Prase exception compileStatements: {e}')
+            elif self.have("keyword", "do"):
+                try:
+                    statement_tree.addChild(self.compileDo())
+                except ParseException as e:
+                    print(f'Prase exception compileStatements: {e}')
+            elif self.have("keyword", "return"):
+                try:
+                    statement_tree.addChild(self.compileReturn())
+                except ParseException as e:
+                    print(f'Prase exception compileStatements: {e}')
             try:
                 self.current()
             except ParseException as e:
@@ -413,6 +433,9 @@ if __name__ == "__main__":
     tokens = []
     tokens.append(Token("keyword", "let"))
     tokens.append(Token("identifier", "varName"))
+    tokens.append(Token("symbol", "["))
+    tokens.append(Token("stringConstant", '"hello"'))
+    tokens.append(Token("symbol", "]"))
     tokens.append(Token("symbol", "="))
     tokens.append(Token("stringConstant", '"hello"'))
     tokens.append(Token("symbol", ";"))
