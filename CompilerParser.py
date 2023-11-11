@@ -314,6 +314,7 @@ class CompilerParser:
             expression_tree.addChild(self.mustBe("keyword","skip"))
         else:
             expression_tree.addChild(self.compileTerm())
+            print(expression_tree)
             op_symbols = ["+", "-", "*", "/", "&", "|", "<", ">", "="]
             try:
                 while self.have("symbol", op_symbols) is True:
@@ -349,9 +350,11 @@ class CompilerParser:
                 term_tree.addChild(self.compileExpression())
                 term_tree.addChild(self.mustBe("symbol", ")"))
             elif self.have("symbol", "."):
+                term_tree.addChild(self.mustBe("symbol", "."))
+                current_token = self.current()
                 term_tree.addChild(self.mustBe("identifier", current_token.getValue()))
                 term_tree.addChild(self.mustBe("symbol", "("))
-                term_tree.addChild(self.compileExpression())
+                term_tree.addChild(self.compileExpressionList())
                 term_tree.addChild(self.mustBe("symbol", ")"))
         elif self.have("symbol", "("):
             term_tree.addChild(self.mustBe("symbol", "("))
@@ -517,13 +520,22 @@ if __name__ == "__main__":
     
     tokens.append(Token("integerConstant", "1"))
     tokens.append(Token("symbol", "+"))
-        
-    """
-    tokens = []
+    
     tokens.append(Token("symbol", "("))
     tokens.append(Token("identifier", "a"))
     tokens.append(Token("symbol", "-"))
     tokens.append(Token("identifier", "b"))
+    tokens.append(Token("symbol", ")"))
+        
+    """
+    tokens = []
+    tokens.append(Token("identifier", "Main"))
+    tokens.append(Token("symbol", "."))
+    tokens.append(Token("identifier", "myfunc"))
+    tokens.append(Token("symbol", "("))
+    tokens.append(Token("integerConstant", "1"))
+    tokens.append(Token("symbol", ","))
+    tokens.append(Token("stringConstant", "Hello"))
     tokens.append(Token("symbol", ")"))
     
     parser = CompilerParser(tokens)
