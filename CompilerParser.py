@@ -131,6 +131,7 @@ class CompilerParser:
                 param_tree.addChild(self.mustBe("identifier", class_name))
             param_name = self.current().getValue()
             param_tree.addChild(self.mustBe("identifier", param_name))
+            print(param_tree)
             try:
                 while self.have("symbol", ",") is True:
                         param_tree.addChild(self.mustBe("symbol", ","))
@@ -157,7 +158,6 @@ class CompilerParser:
             VarDec = self.compileVarDec()
         except ParseException as e:
             pass
-        subbody_tree.addChild(self.compileStatements())
         subbody_tree.addChild(self.mustBe("symbol", "}"))
 
         return subbody_tree
@@ -198,62 +198,14 @@ class CompilerParser:
         Generates a parse tree for a series of statements
         @return a ParseTree that represents the series of statements
         """
-        statement_tree = ParseTree("statements", " ")
-        while self.have("symbol", "}") is not True:
-            if self.have("keyword", "let"):
-                try:
-                    statement_tree.addChild(self.compileLet())
-                except ParseException as e:
-                    print(f'Prase exception compileStatements: {e}')
-            elif self.have("keyword", "if"):
-                try:
-                    statement_tree.addChild(self.compileIf())
-                except ParseException as e:
-                    print(f'Prase exception compileStatements: {e}')
-            elif self.have("keyword", "while"):
-                try:
-                    statement_tree.addChild(self.compileWhile())
-                except ParseException as e:
-                    print(f'Prase exception compileStatements: {e}')
-            elif self.have("keyword", "do"):
-                try:
-                    statement_tree.addChild(self.compileDo())
-                except ParseException as e:
-                    print(f'Prase exception compileStatements: {e}')
-            elif self.have("keyword", "return"):
-                try:
-                    statement_tree.addChild(self.compileReturn())
-                except ParseException as e:
-                    print(f'Prase exception compileStatements: {e}')
-            try:
-                self.current()
-            except ParseException as e:
-                break
-        return statement_tree
+        return None
 
     def compileLet(self):
         """
         Generates a parse tree for a let statement
         @return a ParseTree that represents the statement
         """
-        let_tree = ParseTree("letStatement", " ")
-        let_tree.addChild(self.mustBe("keyword","let"))
-        var_name = self.current().getValue()
-        let_tree.addChild(self.mustBe("identifier", var_name))
-        if self.have ("symbol", "=") is False:
-            let_tree.addChild(self.mustBe("symbol", "["))
-            try:
-                let_tree.addChild(self.compileExpression())
-            except ParseException as e:
-                print(f'Prase exception compileLet: {e}')
-            let_tree.addChild(self.mustBe("symbol", "]"))   
-        let_tree.addChild(self.mustBe("symbol", "="))
-        try:
-            let_tree.addChild(self.compileExpression())
-        except ParseException as e:
-            print(f'Prase exception compileLet: {e}')
-        let_tree.addChild(self.mustBe("symbol", ";"))
-        return let_tree
+        return None
 
     def compileIf(self):
         """
@@ -288,50 +240,20 @@ class CompilerParser:
         Generates a parse tree for an expression
         @return a ParseTree that represents the expression
         """
-        expression_tree = ParseTree("expression", " ")
-        if self.have("keyword", "skip"):
-            expression_tree.addChild(self.mustBe("keyword","skip"))
-        else:
-            try:
-                expression_tree.addChild(self.compileTerm())
-            except ParseException as e:
-                print(f'Prase exception compileExpression: {e}')
-            """
-            expression_finish_symbols = ["]", ")", ";", ","]
-            while self.have("symbol", expression_finish_symbols) is False:
-                try:
-                    expression_tree.addChild(self.compileTerm())
-                except ParseException as e:
-                    print(f'Prase exception compileExpression: {e}')
-                try:
-                    self.current()
-                except ParseException as e:
-                    break
-            """
-        return expression_tree
+        return None
 
     def compileTerm(self):
         """
         Generates a parse tree for an expression term
         @return a ParseTree that represents the expression term
         """
-        term_tree = ParseTree("term", " ")
-        current_token = self.current()
-        if current_token.getType() == "integerConstant":
-            term_tree.addChild(self.mustBe("integerConstant", current_token.getValue()))
-        elif current_token.getType() == "stringConstant":
-            term_tree.addChild(self.mustBe("stringConstant", current_token.getValue()))
-        else:
-            return None
-        return term_tree
+        return None
 
     def compileExpressionList(self):
         """
         Generates a parse tree for an expression list
         @return a ParseTree that represents the expression list
         """
-
-            
         return None
 
     def next(self):
@@ -393,40 +315,8 @@ if __name__ == "__main__":
         class MyClass {
 
         }
-        
-    tokens.append(Token("keyword", "class"))
-    tokens.append(Token("identifier", "MyClass"))
-    tokens.append(Token("symbol", "{"))
-    tokens.append(Token("symbol", "}"))
-    
-    tokens.append(Token("keyword", "class"))
-    tokens.append(Token("identifier", "MyClass"))
-    tokens.append(Token("symbol", "{"))
-    tokens.append(Token("keyword", "function"))
-    tokens.append(Token("keyword", "int"))
-    tokens.append(Token("identifier", "a"))
-    tokens.append(Token("symbol", "("))
-    tokens.append(Token("symbol", ")"))
-    tokens.append(Token("symbol", "{"))
-    tokens.append(Token("keyword", "let"))
-    tokens.append(Token("identifier", "varName"))
-    tokens.append(Token("symbol", "="))
-    tokens.append(Token("keyword", "skip"))
-    tokens.append(Token("symbol", ";"))
-    tokens.append(Token("symbol", "}"))
-    tokens.append(Token("symbol", "}"))
-    
-    tokens.append(Token("symbol", "{"))
-     tokens.append(Token("keyword", "let"))
-    tokens.append(Token("identifier", "varName"))
-    tokens.append(Token("symbol", "["))
-    tokens.append(Token("stringConstant", '"hello"'))
-    tokens.append(Token("symbol", "]"))
-    tokens.append(Token("symbol", "="))
-    tokens.append(Token("stringConstant", '"hello"'))
-    tokens.append(Token("symbol", ";"))
-    tokens.append(Token("symbol", "}"))
-    
+    """
+    tokens = []
     tokens.append(Token("keyword", "int"))
     tokens.append(Token("identifier", "a"))
     tokens.append(Token("symbol", ","))
@@ -438,30 +328,10 @@ if __name__ == "__main__":
     tokens.append(Token("symbol", ","))
     tokens.append(Token("identifier", "Test"))
     tokens.append(Token("identifier", "d"))
-        
-    """
-    tokens = []
-   
-    tokens.append(Token("keyword", "class"))
-    tokens.append(Token("identifier", "MyClass"))
-    tokens.append(Token("symbol", "{"))
-    tokens.append(Token("keyword", "function"))
-    tokens.append(Token("keyword", "int"))
-    tokens.append(Token("identifier", "a"))
-    tokens.append(Token("symbol", "("))
-    tokens.append(Token("symbol", ")"))
-    tokens.append(Token("symbol", "{"))
-    tokens.append(Token("keyword", "let"))
-    tokens.append(Token("identifier", "varName"))
-    tokens.append(Token("symbol", "="))
-    tokens.append(Token("keyword", "skip"))
-    tokens.append(Token("symbol", ";"))
-    tokens.append(Token("symbol", "}"))
-    tokens.append(Token("symbol", "}"))
     
     parser = CompilerParser(tokens)
     try:
-        result = parser.compileProgram()
+        result = parser.compileParameterList()
         print(result)
     except ParseException:
         print("Error Parsing!")

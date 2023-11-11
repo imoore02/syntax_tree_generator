@@ -157,6 +157,7 @@ class CompilerParser:
             VarDec = self.compileVarDec()
         except ParseException as e:
             pass
+        subbody_tree.addChild(self.compileStatements())
         subbody_tree.addChild(self.mustBe("symbol", "}"))
 
         return subbody_tree
@@ -416,6 +417,15 @@ if __name__ == "__main__":
     tokens.append(Token("symbol", "}"))
     
     tokens.append(Token("symbol", "{"))
+     tokens.append(Token("keyword", "let"))
+    tokens.append(Token("identifier", "varName"))
+    tokens.append(Token("symbol", "["))
+    tokens.append(Token("stringConstant", '"hello"'))
+    tokens.append(Token("symbol", "]"))
+    tokens.append(Token("symbol", "="))
+    tokens.append(Token("stringConstant", '"hello"'))
+    tokens.append(Token("symbol", ";"))
+    tokens.append(Token("symbol", "}"))
     
     tokens.append(Token("keyword", "int"))
     tokens.append(Token("identifier", "a"))
@@ -431,21 +441,27 @@ if __name__ == "__main__":
         
     """
     tokens = []
+   
+    tokens.append(Token("keyword", "class"))
+    tokens.append(Token("identifier", "MyClass"))
+    tokens.append(Token("symbol", "{"))
+    tokens.append(Token("keyword", "function"))
+    tokens.append(Token("keyword", "int"))
+    tokens.append(Token("identifier", "a"))
+    tokens.append(Token("symbol", "("))
+    tokens.append(Token("symbol", ")"))
+    tokens.append(Token("symbol", "{"))
     tokens.append(Token("keyword", "let"))
     tokens.append(Token("identifier", "varName"))
-    tokens.append(Token("symbol", "["))
-    tokens.append(Token("stringConstant", '"hello"'))
-    tokens.append(Token("symbol", "]"))
     tokens.append(Token("symbol", "="))
-    tokens.append(Token("stringConstant", '"hello"'))
+    tokens.append(Token("keyword", "skip"))
     tokens.append(Token("symbol", ";"))
     tokens.append(Token("symbol", "}"))
-    
-	
+    tokens.append(Token("symbol", "}"))
     
     parser = CompilerParser(tokens)
     try:
-        result = parser.compileStatements()
+        result = parser.compileProgram()
         print(result)
     except ParseException:
         print("Error Parsing!")
