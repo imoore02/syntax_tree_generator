@@ -213,6 +213,14 @@ class CompilerParser:
         try:
             if self.have("keyword", "let") is True:
                 statement_tree.addChild(self.compileLet())
+            elif self.have("keyword", "if") is True:
+                    statement_tree.addChild(self.compileIf())
+            elif self.have("keyword", "while") is True:
+                    statement_tree.addChild(self.compileWhile())
+            elif self.have("keyword", "do") is True:
+                    statement_tree.addChild(self.compileDo())
+            elif self.have("keyword", "return") is True:
+                    statement_tree.addChild(self.compileReturn())
         except ParseException as e:
                     print(f'Prase exception compileStatements: {e}')
         return statement_tree
@@ -230,28 +238,32 @@ class CompilerParser:
         Generates a parse tree for an if statement
         @return a ParseTree that represents the statement
         """
-        return None
+        if_tree = ParseTree("ifStatement", " ")
+        return if_tree
 
     def compileWhile(self):
         """
         Generates a parse tree for a while statement
         @return a ParseTree that represents the statement
         """
-        return None
+        while_tree = ParseTree("whileStatement", " ")
+        return while_tree
 
     def compileDo(self):
         """
         Generates a parse tree for a do statement
         @return a ParseTree that represents the statement
         """
-        return None
+        do_tree = ParseTree("doStatement", " ")
+        return do_tree
 
     def compileReturn(self):
         """
         Generates a parse tree for a return statement
         @return a ParseTree that represents the statement
         """
-        return None
+        return_tree = ParseTree("returnStatement", " ")
+        return return_tree
 
     def compileExpression(self):
         """
