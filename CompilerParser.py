@@ -317,6 +317,7 @@ class CompilerParser:
             op_symbols = ["+", "-", "*", "/", "&", "|", "<", ">", "="]
             try:
                 while self.have("symbol", op_symbols) is True:
+                     expression_tree.addChild(self.mustBe("symbol", op_symbols))
                      expression_tree.addChild(self.compileTerm())
             except ParseException as e:
                     print(f'Prase exception compileExpression: {e}')
@@ -328,6 +329,28 @@ class CompilerParser:
         @return a ParseTree that represents the expression term
         """
         term_tree = ParseTree("term", " ")
+        keywordConstant = ["true", "false", "null", "this"]
+        unaryOp = ["-", "~"]
+        current_token = self.current()
+        if current_token.getType() == "integerConstant":
+            term_tree.addChild(self.mustBe("integerConstant", current_token.getValue()))
+        elif current_token.getType() == "stringConstant":
+            term_tree.addChild(self.mustBe("stringConstant", current_token.getValue()))
+        elif self.have("keywordConstant", keywordConstant):
+            term_tree.addChild(self.mustBe("keyword", current_token.getValue()))
+        elif current_token.getType() == "identifier":
+            term_tree.addChild(self.mustBe("identifier", current_token.getValue()))
+            if self.have("symbol", "["):
+                term_tree.addChild(self.mustBe("symbol", "["))
+                term_tree.addChild(self.compileExpression())
+                term_tree.addChild(self.mustBe("symbol", "]"))
+        elif self.have("symbol", "("):
+            term_tree.addChild(self.mustBe("symbol", "("))
+            term_tree.addChild(self.compileExpression())
+            term_tree.addChild(self.mustBe("symbol", ")"))
+        elif self.have("symbol", unaryOp):
+            term_tree.addChild("sybmol", unaryOp)
+            term_tree.addChild(self.compileTerm())
         return term_tree
 
     def compileExpressionList(self):
@@ -475,11 +498,12 @@ if __name__ == "__main__":
     tokens.append(Token("keyword", "do"))
     tokens.append(Token("keyword", "skip"))
     tokens.append(Token("symbol", ";"))
+    
+    tokens.append(Token("integerConstant", "1"))
+    tokens.append(Token("symbol", "+"))
         
     """
     tokens = []
-    tokens.append(Token("integerConstant", "1"))
-    tokens.append(Token("symbol", "+"))
     tokens.append(Token("symbol", "("))
     tokens.append(Token("identifier", "a"))
     tokens.append(Token("symbol", "-"))
@@ -488,7 +512,7 @@ if __name__ == "__main__":
     
     parser = CompilerParser(tokens)
     try:
-        result = parser.compileExpression()
+        result = parser.compileTerm()
         print(result)
     except ParseException:
         print("Error Parsing!")
