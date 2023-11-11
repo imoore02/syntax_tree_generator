@@ -200,6 +200,11 @@ class CompilerParser:
         @return a ParseTree that represents the series of statements
         """
         statement_tree = ParseTree("statements", " ")
+        while self.have("symbol", "}") is not True:
+            try:
+                self.current()
+            except ParseException as e:
+                break
         return statement_tree
 
     def compileLet(self):
