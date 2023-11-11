@@ -199,14 +199,6 @@ class CompilerParser:
         Generates a parse tree for a series of statements
         @return a ParseTree that represents the series of statements
         
-        elif self.have("keyword", "if"):
-                    statement_tree.addChild(self.compileIf())
-            elif self.have("keyword", "while"):
-                    statement_tree.addChild(self.compileWhile())
-            elif self.have("keyword", "do"):
-                    statement_tree.addChild(self.compileDo())
-            elif self.have("keyword", "return"):
-                    statement_tree.addChild(self.compileReturn())
         
         """
         statement_tree = ParseTree("statements", " ")
@@ -231,6 +223,20 @@ class CompilerParser:
         @return a ParseTree that represents the statement
         """
         let_tree = ParseTree("letStatement", " ")
+        let_tree.addChild(self.mustBe("keyword","let"))
+        var_name = self.current().getValue()
+        let_tree.addChild(self.mustBe("identifier", var_name))
+        try:
+             if self.have("symbol", "=") is False:
+                  let_tree.addChild(self.mustBe("symbol", "["))
+                  let_tree.addChild(self.compileExpression())
+                  let_tree.addChild(self.mustBe("symbol", "]"))
+        except ParseException as e:
+                print(f'Prase exception compileLet: {e}')
+        print(let_tree) 
+        let_tree.addChild(self.mustBe("symbol", "="))
+        let_tree.addChild(self.compileExpression())
+        let_tree.addChild(self.mustBe("symbol", ";"))
         return let_tree
 
     def compileIf(self):
@@ -270,7 +276,10 @@ class CompilerParser:
         Generates a parse tree for an expression
         @return a ParseTree that represents the expression
         """
-        return None
+        expression_tree = ParseTree("expression", " ")
+        if self.have("keyword", "skip"):
+            expression_tree.addChild(self.mustBe("keyword","skip"))
+        return expression_tree
 
     def compileTerm(self):
         """
