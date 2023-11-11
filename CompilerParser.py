@@ -267,6 +267,13 @@ class CompilerParser:
         @return a ParseTree that represents the statement
         """
         while_tree = ParseTree("whileStatement", " ")
+        while_tree.addChild(self.mustBe("keyword","while"))
+        while_tree.addChild(self.mustBe("symbol","("))
+        while_tree.addChild(self.compileExpression())
+        while_tree.addChild(self.mustBe("symbol",")"))
+        while_tree.addChild(self.mustBe("symbol","{"))
+        while_tree.addChild(self.compileStatements())
+        while_tree.addChild(self.mustBe("symbol","}"))
         return while_tree
 
     def compileDo(self):
