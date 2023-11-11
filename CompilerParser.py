@@ -293,7 +293,7 @@ class CompilerParser:
         @return a ParseTree that represents the statement
         """
         return_tree = ParseTree("returnStatement", " ")
-        return_tree.addChild(self.mustBe("keyword","do"))
+        return_tree.addChild(self.mustBe("keyword","return"))
         try:
             if self.have("symbol", ";") is False:
                  return_tree.addChild(self.compileExpression())
@@ -440,9 +440,7 @@ if __name__ == "__main__":
     tokens.append(Token("keyword", "skip"))
     tokens.append(Token("symbol", ";"))
     tokens.append(Token("symbol", "}"))
-        
-    """
-    tokens = []
+    
     tokens.append(Token("symbol", "{"))
     tokens.append(Token("keyword", "if"))
     tokens.append(Token("symbol", "("))
@@ -454,10 +452,16 @@ if __name__ == "__main__":
     tokens.append(Token("symbol", "{"))
     tokens.append(Token("symbol", "}"))
     tokens.append(Token("symbol", "}"))
+        
+    """
+    tokens = []
+    tokens.append(Token("keyword", "return"))
+    tokens.append(Token("keyword", "skip"))
+    tokens.append(Token("symbol", ";"))
     
     parser = CompilerParser(tokens)
     try:
-        result = parser.compileSubroutineBody()
+        result = parser.compileReturn()
         print(result)
     except ParseException:
         print("Error Parsing!")
