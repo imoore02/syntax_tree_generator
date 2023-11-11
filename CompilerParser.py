@@ -344,6 +344,15 @@ class CompilerParser:
                 term_tree.addChild(self.mustBe("symbol", "["))
                 term_tree.addChild(self.compileExpression())
                 term_tree.addChild(self.mustBe("symbol", "]"))
+            elif self.have("symbol", "("):
+                term_tree.addChild(self.mustBe("symbol", "("))
+                term_tree.addChild(self.compileExpression())
+                term_tree.addChild(self.mustBe("symbol", ")"))
+            elif self.have("symbol", "."):
+                term_tree.addChild(self.mustBe("identifier", current_token.getValue()))
+                term_tree.addChild(self.mustBe("symbol", "("))
+                term_tree.addChild(self.compileExpression())
+                term_tree.addChild(self.mustBe("symbol", ")"))
         elif self.have("symbol", "("):
             term_tree.addChild(self.mustBe("symbol", "("))
             term_tree.addChild(self.compileExpression())
