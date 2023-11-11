@@ -282,6 +282,9 @@ class CompilerParser:
         @return a ParseTree that represents the statement
         """
         do_tree = ParseTree("doStatement", " ")
+        do_tree.addChild(self.mustBe("keyword","do"))
+        do_tree.addChild(self.compileExpression())
+        do_tree.addChild(self.mustBe("symbol", ";"))
         return do_tree
 
     def compileReturn(self):
@@ -290,6 +293,13 @@ class CompilerParser:
         @return a ParseTree that represents the statement
         """
         return_tree = ParseTree("returnStatement", " ")
+        return_tree.addChild(self.mustBe("keyword","do"))
+        try:
+            if self.have("symbol", ";") is False:
+                 return_tree.addChild(self.compileExpression())
+        except ParseException as e:
+                print(f'Prase exception compileReturn: {e}')
+        return_tree.addChild(self.mustBe("symbol", ";"))
         return return_tree
 
     def compileExpression(self):
