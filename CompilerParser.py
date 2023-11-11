@@ -158,6 +158,7 @@ class CompilerParser:
             VarDec = self.compileVarDec()
         except ParseException as e:
             pass
+        subbody_tree.addChild(self.compileStatements())
         subbody_tree.addChild(self.mustBe("symbol", "}"))
 
         return subbody_tree
